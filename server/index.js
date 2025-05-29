@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,6 +13,10 @@ const wss = new WebSocket.Server({ server });
 const rooms = new Map(); // roomId -> [ws1, ws2]
 
 app.use(express.static('public'));
+
+app.get('/rock-paper-scissors/:roomId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'game.html'));
+});
 
 wss.on('connection', function connection(ws) {
     let roomId;
