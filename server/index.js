@@ -12,7 +12,7 @@ const wss = new WebSocket.Server({ server });
 
 const rooms = new Map(); // roomId -> [ws1, ws2]
 
-app.use('/rock-paper-scissors', express.static('public'));
+app.use(express.static('public'));
 
 app.get('/rock-paper-scissors/room/:roomId', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'game.html'));
