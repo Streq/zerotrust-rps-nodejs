@@ -1,5 +1,5 @@
 const roomId = window.location.pathname.split('/').pop();
-const ws = new WebSocket(`ws://${location.host}`);
+const ws = new WebSocket(`wss://${location.host}`);
 
 let peer;
 let dataChannel;
