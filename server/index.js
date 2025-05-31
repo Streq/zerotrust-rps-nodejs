@@ -14,9 +14,11 @@ const rooms = new Map(); // roomId -> [ws1, ws2]
 
 app.use(express.static('public'));
 
-app.get('/rock-paper-scissors/:roomId', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'game.html'));
+app.get('/rock-paper-scissors/room/:roomId', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'game.html'));
 });
+
+app.use('/rock-paper-scissors', express.static(path.join(__dirname, '..', 'public')));
 
 wss.on('connection', function connection(ws) {
     let roomId;
@@ -34,12 +36,12 @@ wss.on('connection', function connection(ws) {
             }
 
             clients.push(ws);
-            ws.send(JSON.stringify({ type: 'joined', id: clients.length }));
+            ws.send(JSON.stringify({ type: 'joined' }));
 
             if (clients.length === 2) {
                 // Notify both peers
-                clients[0].send(JSON.stringify({ type: 'ready' }));
-                clients[1].send(JSON.stringify({ type: 'ready' }));
+                clients[0].send(JSON.stringify({ type: 'ready', initiator: true }));
+                clients[1].send(JSON.stringify({ type: 'ready', initiator: false }));
             }
         }
 

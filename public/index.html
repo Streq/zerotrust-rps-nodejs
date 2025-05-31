@@ -15,12 +15,12 @@
     <script>
         document.getElementById('create').onclick = () => {
             const id = Math.random().toString(36).slice(2, 10).toUpperCase();
-            window.location.href = `/rock-paper-scissors/${id}`;
+            window.location.href = `/rock-paper-scissors/room/${id}`;
         };
 
         document.getElementById('join').onclick = () => {
             const id = document.getElementById('room-id').value.trim().toUpperCase();
-            if (id) window.location.href = `/rock-paper-scissors/${id}`;
+            if (id) window.location.href = `/rock-paper-scissors/room/${id}`;
         };
     </script>
 </body>
