@@ -1,18 +1,13 @@
 // server/index.js
 
 const express = require('express');
-const https = require('https');
+const http = require('http');
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
 const app = express();
-const fs = require('fs');
-const credentials = {
-    key: fs.readFileSync(process.env.SSL_KEY_PATH, 'utf8'),
-    cert: fs.readFileSync(process.env.SSL_CERT_PATH, 'utf8')
-};
-const server = https.createServer(credentials, app);
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const rooms = new Map(); // roomId -> [ws1, ws2]

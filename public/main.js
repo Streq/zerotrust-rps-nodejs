@@ -1,5 +1,6 @@
 const roomId = window.location.pathname.split('/').pop();
-const ws = new WebSocket(`wss://${location.host}`);
+const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
 
 let peer;
 let dataChannel;
@@ -197,10 +198,8 @@ async function resolveRound() {
     console.log(`Opponent played: ${opponentMove}`);
 
     document.getElementById('opponent-state').innerText = `Opponent played ${opponentMove}`;
-    let myMove = localMove;
-    let opMove = opponentMove;
-    goto("new_round");
-    updateScore(myMove, opMove);
+    let state = updateScore(localMove, opponentMove);
+    goto(state);
 }
 
 function updateScore(selfMove, otherMove) {
@@ -221,9 +220,10 @@ function updateScore(selfMove, otherMove) {
 
     if (scores.self >= 5 || scores.opponent >= 5) {
         if (scores.self !== scores.opponent) {
-            goto("gameover")
+            return "gameover"
         }
     }
+    return "new_round"
 }
 
 // --- Key serialization helpers ---
