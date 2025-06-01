@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Zero Trust RPS</title>
+    <title>RPS</title>
 </head>
 
 <body>
-    <h1>Zero Trust Rock Paper Scissors</h1>
+    <h1>Rock Paper Scissors</h1>
     <button id="create">Create Room</button>
     <input id="room-id" placeholder="Enter Room ID" />
     <button id="join">Join Room</button>
@@ -15,12 +15,12 @@
     <script>
         document.getElementById('create').onclick = () => {
             const id = Math.random().toString(36).slice(2, 10).toUpperCase();
-            window.location.href = `/rock-paper-scissors/room/${id}`;
+            window.location.href = `./room/${id}`;
         };
 
         document.getElementById('join').onclick = () => {
             const id = document.getElementById('room-id').value.trim().toUpperCase();
-            if (id) window.location.href = `/rock-paper-scissors/room/${id}`;
+            if (id) window.location.href = `./room/${id}`;
         };
     </script>
 </body>
