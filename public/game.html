@@ -30,6 +30,11 @@
         .column {
             flex: 50%;
         }
+
+        ul,
+        li {
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -61,8 +66,18 @@
         <div id="play_again">
             <button>Rematch</button>
         </div>
-    </div>
 
+    </div>
+    <div>
+        <h2>Rules</h2>
+        <ul>
+            <li>Win -> +2 points</li>
+            <li>Draw -> +1 points</li>
+            <li>Lose -> +0 points</li>
+            <li>The first to reach 5 points wins</li>
+            <li>If draw after 5 points the game continues until somebody wins</li>
+        </ul>
+    </div>
     <script src="../main.js"></script>
 </body>
 
