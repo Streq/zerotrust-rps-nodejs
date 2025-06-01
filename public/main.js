@@ -1,6 +1,6 @@
 const [path, roomId] = window.location.pathname.split('/room/');
 const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const ws = new WebSocket(`${wsProtocol}://${window.location.host}${path}`);
+const ws = new WebSocket(`${wsProtocol}://${window.location.host}${path}/`);
 
 let peer;
 let dataChannel;
