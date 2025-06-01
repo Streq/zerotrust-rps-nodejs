@@ -13,6 +13,7 @@ let localKey = null;
 let opponentKey = null;
 let hasOpponentKey = false;
 let scores = { self: 0, opponent: 0 };
+let scores_before = { self: 0, opponent: 0 };
 let sentKey = false;
 let wantRematch = false;
 let opponentWantsRematch = false;
@@ -20,9 +21,9 @@ let opponentWantsRematch = false;
 goto('init');
 
 function splitLast(str, separator) {
-  const i = str.lastIndexOf(separator);
-  if (i === -1) return [str];
-  return [str.slice(0, i), str.slice(i + separator.length)];
+    const i = str.lastIndexOf(separator);
+    if (i === -1) return [str];
+    return [str.slice(0, i), str.slice(i + separator.length)];
 }
 
 function goto(state) {
@@ -30,29 +31,34 @@ function goto(state) {
         case 'init':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = true);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
-            document.getElementById('status').innerText = "Waiting for a connection...";
+            document.querySelector('#me .state').innerText = "Waiting for a connection...";
             break;
         case 'gameover':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = true);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = false);
-            const winner = scores.self > scores.opponent ? 'You win!' : 'Opponent wins!';
-            document.getElementById('status').innerText = winner;
+            const [me, op] = scores.self > scores.opponent ? ['WIN', 'LOSES'] : ['LOST', 'WINS'];
+            document.querySelector('#me .state').innerText = me;
+            document.querySelector('#op .state').innerText = op;
             break;
         case 'new_round':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = false);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
+            document.querySelector('#me .state').innerText = "Not Chosen";
+            document.querySelector('#op .state').innerText = "Not Chosen";
             break;
         case 'new_game':
             wantRematch = false;
             opponentWantsRematch = false;
             scores = { self: 0, opponent: 0 };
+            scores_before = { self: 0, opponent: 0 };
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = false);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
-            document.getElementById('status').innerText = "New Game Started! Make your move.";
-            document.getElementById('opponent-state').innerText = "Opponent has not chosen";
+            document.querySelector('#me .state').innerText = "Not Chosen";
+            document.querySelector('#op .state').innerText = "Not Chosen";
             isReady = true;
             break;
     }
+    document.querySelectorAll('#moves button').forEach(btn => btn.style.display = 'initial');
     localMove = null;
     opponentEncryptedMove = null;
     hasOpponentEncryptedMove = false;
@@ -60,31 +66,14 @@ function goto(state) {
     opponentKey = null;
     hasOpponentKey = false;
     sentKey = false;
-    document.getElementById('score').innerText = `You: ${scores.self} | Opponent: ${scores.opponent}`;
-
+    let selfDelta = scores.self - scores_before.self
+    document.querySelector('#me .score').innerText = `${scores.self}${selfDelta ? ` (+${selfDelta})` : ""}`;
+    let oppDelta = scores.opponent - scores_before.opponent
+    document.querySelector('#op .score').innerText = `${scores.opponent}${oppDelta ? ` (+${oppDelta})` : ""}`;
 }
-
-document.querySelectorAll('#moves button').forEach(btn => {
-    btn.onclick = async () => {
-        if (!isReady || localMove) return;
-        localMove = btn.dataset.move;
-        btn.disabled = true;
-        localKey = await generateKey();
-        const encrypted = await encryptMove(localMove, localKey);
-        dataChannel.send(JSON.stringify({ type: 'move', data: encrypted }));
-        document.getElementById('status').innerText = `You chose ${localMove}`;
-    };
-});
-
-document.querySelectorAll('#play_again button').forEach(btn => {
-    btn.onclick = async () => {
-        btn.disabled = true;
-        dataChannel.send(JSON.stringify({ type: 'rematch' }))
-        document.getElementById('status'.innerText = 'Requesting rematch...')
-        wantRematch = true;
-        tryRematch();
-    }
-})
+function capitalizeFirstLetter(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
 
 ws.onopen = () => {
     ws.send(JSON.stringify({ type: 'join', roomId }));
@@ -112,8 +101,8 @@ ws.onmessage = async (event) => {
     }
 
     if (msg.type === 'left') {
-        document.getElementById('opponent-state').innerText = "Opponent left the game."
-        document.getElementById('status').innerText = "Waiting for a connection...";
+        document.querySelector('#op .state').innerText = "Opponent left the game."
+        document.querySelector('#me .state').innerText = "Waiting for a connection...";
     }
 };
 
@@ -142,7 +131,7 @@ function startWebRTC(isInitiator) {
         if (msg.type === 'move' && !hasOpponentEncryptedMove) {
             hasOpponentEncryptedMove = true;
             opponentEncryptedMove = msg.data;
-            document.getElementById('opponent-state').innerText = "Opponent chose!";
+            document.querySelector('#op .state').innerText = "Move Submitted";
             tryResolve();
         }
 
@@ -186,7 +175,6 @@ function tryResolve() {
             });
         }
 
-
         if (opponentKey) {
             resolveRound();
         }
@@ -201,35 +189,12 @@ function tryRematch() {
 
 async function resolveRound() {
     const opponentMove = await decryptMove(opponentEncryptedMove, opponentKey);
-    console.log(`Opponent played: ${opponentMove}`);
+    console.log(`Opponent chose: ${opponentMove}`);
 
-    document.getElementById('opponent-state').innerText = `Opponent played ${opponentMove}`;
+    document.querySelector('#op .move').innerText = `${MOVES[opponentMove].fullName}`;
+    document.querySelector('#me .move').innerText = `${MOVES[localMove].fullName}`;
     let state = updateScore(localMove, opponentMove);
     goto(state);
-}
-
-function updateScore(selfMove, otherMove) {
-    const rules = {
-        rock: 'scissors',
-        paper: 'rock',
-        scissors: 'paper'
-    };
-
-    if (selfMove === otherMove) {
-        scores.self += 1;
-        scores.opponent += 1;
-    } else if (rules[selfMove] === otherMove) {
-        scores.self += 2;
-    } else {
-        scores.opponent += 2;
-    }
-
-    if (scores.self >= 5 || scores.opponent >= 5) {
-        if (scores.self !== scores.opponent) {
-            return "gameover"
-        }
-    }
-    return "new_round"
 }
 
 // --- Key serialization helpers ---
@@ -250,3 +215,78 @@ async function decryptMove({ iv, data }, key) {
     const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: ivArr }, key, encData);
     return new TextDecoder().decode(decrypted);
 }
+
+const MOVES = {
+    'rock': {
+        icon: '🪨',
+        beats: 'scissors',
+    },
+    'paper': {
+        icon: '📄',
+        beats: 'rock',
+    },
+    'scissors': {
+        icon: '✂️',
+        beats: 'paper',
+    }
+}
+function updateScore(selfMove, otherMove) {
+    scores_before.self = scores.self;
+    scores_before.opponent = scores.opponent;
+    if (selfMove === otherMove) {
+        scores.self += 1;
+        scores.opponent += 1;
+    } else if (MOVES[selfMove].beats === otherMove) {
+        scores.self += 2;
+    } else {
+        scores.opponent += 2;
+    }
+
+    if (scores.self >= 5 || scores.opponent >= 5) {
+        if (scores.self !== scores.opponent) {
+            return "gameover"
+        }
+    }
+    return "new_round"
+}
+function init() {
+    let container = document.querySelector('#moves');
+
+    for (const [move, value] of Object.entries(MOVES)) {
+        let btn = document.createElement('button');
+        let icon = value.icon;
+        let capitalized = capitalizeFirstLetter(move);
+        value.capitalized = capitalized;
+        let fullName = `${icon} ${capitalized}`;
+        value.fullName = fullName;
+        btn.textContent = fullName;
+
+        btn.onclick = async () => {
+            if (!isReady || localMove) return;
+            localMove = move;
+            btn.disabled = true;
+
+            document.querySelectorAll('#moves button').forEach(btn => { btn.disabled = true; btn.style.display = 'none'; });
+            btn.style.display = 'initial';
+            localKey = await generateKey();
+            const encrypted = await encryptMove(localMove, localKey);
+            dataChannel.send(JSON.stringify({ type: 'move', data: encrypted }));
+            document.querySelector('#me .state').innerText = "Move Submitted";
+
+        };
+
+        container.appendChild(btn);
+    }
+
+
+
+    const rematch = document.querySelector('#play_again button')
+    rematch.onclick = async () => {
+        rematch.disabled = true;
+        dataChannel.send(JSON.stringify({ type: 'rematch' }))
+        document.querySelector('#me .state').innerText = 'Requesting rematch...'
+        wantRematch = true;
+        tryRematch();
+    }
+}
+init();

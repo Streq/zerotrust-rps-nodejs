@@ -6,21 +6,60 @@
     <title>Game Room</title>
     <script src="https://cdn.jsdelivr.net/npm/simple-peer@9/simplepeer.min.js"></script>
     <link rel="stylesheet" href="../main.css">
+    <style>
+        #center {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            position: absolute;
+        }
+
+        .left,
+        .right {
+            white-space: nowrap;
+            border-color: white;
+            border-width: 1px;
+            border-style: double;
+            border-radius: 1vw;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .column {
+            flex: 50%;
+        }
+    </style>
 </head>
 
 <body>
     <div class="content">
-        <h1>Zero Trust RPS</h1>
-        <div id="status">Connecting...</div>
-        <div id="score">You: 0 | Opponent: 0</div>
-        <div id="opponent-state"></div>
+        <h1>Rock Paper Scissors</h1>
+        <div class="row">
+            <div id="me" class="column left">
+                <div style="text-align: center;">YOU</div>
+                <div>
+                    <span></span> <span class="score">0</span>
+                </div>
+                <div class="state">Connecting...</div>
+                <div class="move">No Move</div>
+            </div>
+            <div style="width: 2vw;"></div>
+            <div id="op" class="column right">
+                <div style="text-align: center;">OPPONENT</div>
+                <div>
+                    <span></span> <span class="score">0</span>
+                </div>
+                <div class="state">Not Here Yet</div>
+                <div class="move">No Move</div>
+            </div>
+        </div>
+
         <div id="moves">
-            <button data-move="rock">🪨 Rock</button>
-            <button data-move="paper">📄 Paper</button>
-            <button data-move="scissors">✂️ Scissors</button>
         </div>
         <div id="play_again">
-            <button>Play Again</button>
+            <button>Rematch</button>
         </div>
     </div>
 
