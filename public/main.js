@@ -1,6 +1,6 @@
-const roomId = window.location.pathname.split('/').pop();
+const [path, roomId] = window.location.pathname.split('/room/');
 const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
+const ws = new WebSocket(`${wsProtocol}://${window.location.host}${path}`);
 
 let peer;
 let dataChannel;
@@ -18,6 +18,12 @@ let wantRematch = false;
 let opponentWantsRematch = false;
 
 goto('init');
+
+function splitLast(str, separator) {
+  const i = str.lastIndexOf(separator);
+  if (i === -1) return [str];
+  return [str.slice(0, i), str.slice(i + separator.length)];
+}
 
 function goto(state) {
     switch (state) {
