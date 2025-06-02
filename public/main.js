@@ -31,20 +31,20 @@ function goto(state) {
         case 'init':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = true);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
-            document.querySelector('#me .state').innerText = "Waiting for a connection...";
+            document.querySelector('#me .state').innerText = "Connecting...";
             break;
         case 'gameover':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = true);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = false);
-            const [me, op] = scores.self > scores.opponent ? ['WIN', 'LOSES'] : ['LOST', 'WINS'];
-            document.querySelector('#me .state').innerText = me;
-            document.querySelector('#op .state').innerText = op;
+            const [me, op] = scores.self > scores.opponent ? ['<span style="color:green">WIN</span>', 'LOSES'] : ['<span style="color:red">LOSE</span>', 'WINS'];
+            document.querySelector('#me .state').innerHTML = me;
+            document.querySelector('#op .state').innerHTML = op;
             break;
         case 'new_round':
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = false);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
-            document.querySelector('#me .state').innerText = "Not Chosen";
-            document.querySelector('#op .state').innerText = "Not Chosen";
+            document.querySelector('#me .state').innerHTML = "<span style='color:gray'>Choose!</span>";
+            document.querySelector('#op .state').innerHTML = "<span style='color:gray'>Not Chosen</span>";
             break;
         case 'new_game':
             wantRematch = false;
@@ -53,8 +53,8 @@ function goto(state) {
             scores_before = { self: 0, opponent: 0 };
             document.querySelectorAll('#moves button').forEach(btn => btn.disabled = false);
             document.querySelectorAll('#play_again button').forEach(btn => btn.disabled = true);
-            document.querySelector('#me .state').innerText = "Not Chosen";
-            document.querySelector('#op .state').innerText = "Not Chosen";
+            document.querySelector('#me .state').innerHTML = "<span style='color:gray'>Choose!</span>";
+            document.querySelector('#op .state').innerHTML = "<span style='color:gray'>Not Chosen</span>";
             isReady = true;
             break;
     }
@@ -67,9 +67,9 @@ function goto(state) {
     hasOpponentKey = false;
     sentKey = false;
     let selfDelta = scores.self - scores_before.self
-    document.querySelector('#me .score').innerText = `${scores.self}${selfDelta ? ` (+${selfDelta})` : ""}`;
+    document.querySelector('#me .score').innerHTML = `${scores.self}${selfDelta > 0 ? ` <span style="color:green">(+${selfDelta})</span>` : ""}`;
     let oppDelta = scores.opponent - scores_before.opponent
-    document.querySelector('#op .score').innerText = `${scores.opponent}${oppDelta ? ` (+${oppDelta})` : ""}`;
+    document.querySelector('#op .score').innerHTML = `${scores.opponent}${oppDelta > 0 ? ` <span style="color:red">(+${oppDelta})</span>` : ""}`;
 }
 function capitalizeFirstLetter(val) {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
@@ -101,8 +101,8 @@ ws.onmessage = async (event) => {
     }
 
     if (msg.type === 'left') {
-        document.querySelector('#op .state').innerText = "Opponent left the game."
-        document.querySelector('#me .state').innerText = "Waiting for a connection...";
+        document.querySelector('#op .state').innerText = "Left."
+        document.querySelector('#me .state').innerText = "Connecting...";
     }
 };
 
