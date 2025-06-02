@@ -20,7 +20,8 @@
             border-color: white;
             border-width: 1px;
             border-style: double;
-            border-radius: 1vw;
+            border-radius: max(1vw, 1vh);
+            padding: max(1vw, 1vh);
         }
 
         .row {
@@ -33,7 +34,9 @@
 
         ul,
         li {
-            text-align: left;
+            align-content: center;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -50,7 +53,7 @@
                 <div class="state">Connecting...</div>
                 <div class="move">No Move</div>
             </div>
-            <div style="width: 2vw;"></div>
+            <div style="width: max(2vw, 2vh);"></div>
             <div id="op" class="column right">
                 <div style="text-align: center;">OPPONENT</div>
                 <div>

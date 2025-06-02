@@ -5,27 +5,27 @@ button, textarea, input, div, p, span {
 }
 
 body {
-    font-family: sans-serif;
+    font-family: monospace;
     text-align: center;
     padding: 0vw;
-    font-size: 3vw;
+    font-size: max(1vw, 1vh);
 }
 
 #moves button,
-#play_again button {
-    margin: 1vw;
-    font-size: 3vw;
+#play_again button, #me, #op {
+    margin: max(1vw, 1vh);
+    font-size: max(2vw, 2vh);
 }
 
 #score {
-    margin: 3vw 0;
+    margin: max(1vw, 1vh);
 }
 
 button {
   font-size: inherit;
   font-family: inherit;
-  border-radius: 1vw;
-  padding: 1vw;
+  border-radius: max(1vw, 1vh);
+  padding: max(1vw, 1vh);
 }
 @media (prefers-color-scheme: dark) {
     body {
